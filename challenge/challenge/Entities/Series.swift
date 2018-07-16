@@ -24,11 +24,15 @@ class Serie {
     var name: String!
     var overview: String!
     var posterURL: String!
+//    var budget: Int?
+    var voteAverage : Float!
     
     init(_ json: [String:Any]){
         self.id = json["id"] as! Int
         self.name = json["original_name"] as! String
         self.overview = json["overview"] as! String
-        self.posterURL = "https://image.tmdb.org/t/p/w500\(json["poster_path"] as! String)"
+        self.posterURL = APIManager.APIImage + "\(json["poster_path"] as! String)"
+//        self.budget = json["budget"] as? Int
+        self.voteAverage = (json["vote_average"] as! NSNumber).floatValue
     }
 }

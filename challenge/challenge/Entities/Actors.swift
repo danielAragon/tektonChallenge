@@ -29,12 +29,14 @@ class Actor {
         self.id = json["id"] as! Int
         self.name = json["name"] as! String
         
-        plays = [Play]()
-        for play in json["known_for"] as! NSArray{
-            plays.append(Play(play as! [String : Any]))
+        if let json = json["known_for"]{
+            plays = [Play]()
+            for play in json as! NSArray{
+                plays.append(Play(play as! [String : Any]))
+            }
         }
         
-        self.profileURL = "https://image.tmdb.org/t/p/w500\(json["profile_path"] as! String)"
+        self.profileURL = APIManager.APIImage + "\(json["profile_path"] as! String)"
     }
 }
 

@@ -78,4 +78,12 @@ class ActorsViewController: UIViewController, UITableViewDataSource, UITableView
         tableView.reloadData()
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "showActor",
+            let destination = segue.destination as? ActorViewController,
+            let row = tableView.indexPathForSelectedRow?.row{
+            destination.actorId = currentActors![row].id
+        }
+    }
+    
 }

@@ -73,4 +73,11 @@ class SeriesViewController: UIViewController, UITableViewDelegate, UITableViewDa
         tableView.reloadData()
     }
 
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "showSerie",
+            let destination = segue.destination as? SerieViewController,
+            let row = tableView.indexPathForSelectedRow?.row{
+            destination.serieId = currentSeries![row].id
+        }
+    }
 }

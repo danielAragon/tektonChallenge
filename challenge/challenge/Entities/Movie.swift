@@ -25,7 +25,7 @@ class Movie {
     var title: String!
     var overview: String!
     var posterURL: String!
-    var budget: String?
+    var budget: Int?
     var voteAverage : Float!
     
     init(_ json: [String:Any]){
@@ -33,7 +33,7 @@ class Movie {
         self.title = json["title"] as! String
         self.overview = json["overview"] as! String
         self.posterURL = APIManager.APIImage + "\(json["poster_path"] as! String)"
-        self.budget = json["budget"] as? String
+        self.budget = json["budget"] as? Int
         self.voteAverage = (json["vote_average"] as! NSNumber).floatValue
     }
 }

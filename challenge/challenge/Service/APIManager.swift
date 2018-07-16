@@ -17,7 +17,9 @@ public struct APIManager{
     let APIKey = "?api_key=07db23794cd348240def66ce0def1c34"
 
     func fetchMovies(handler: @escaping (MoviesApiResponse?) -> Void) {
+        
         let host = APIBase + "/movie/popular" + APIKey
+        
         Alamofire.request(host, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil)
             .responseJSON { response in
                 switch response.result{
@@ -30,7 +32,9 @@ public struct APIManager{
         }
     }
     func fetchSeries(handler: @escaping (SeriesApiResponse?) -> Void) {
+        
         let host = APIBase + "/tv/popular" + APIKey
+        
         Alamofire.request(host, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil)
             .responseJSON { response in
                 switch response.result{
@@ -43,7 +47,9 @@ public struct APIManager{
         }
     }
     func fetchActors(handler: @escaping (ActorsApiResponse?) -> Void) {
+        
         let host = APIBase + "/person/popular" + APIKey
+        
         Alamofire.request(host, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil)
             .responseJSON { response in
                 switch response.result{
@@ -56,12 +62,42 @@ public struct APIManager{
     }
     
     func fetchMovieById(_ id: Int,handler: @escaping (Movie?) -> Void) {
+        
         let host = APIBase + "/movie" + "/\(id)" + APIKey
+        
         Alamofire.request(host, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil)
             .responseJSON { response in
                 switch response.result{
                 case .success(_):
                     handler(Movie((response.value as? [String: Any])!))
+                case .failure(_):
+                    break
+                }
+        }
+    }
+    func fetchSerieById(_ id: Int,handler: @escaping (Serie?) -> Void) {
+        
+        let host = APIBase + "/tv" + "/\(id)" + APIKey
+        
+        Alamofire.request(host, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil)
+            .responseJSON { response in
+                switch response.result{
+                case .success(_):
+                    handler(Serie((response.value as? [String: Any])!))
+                case .failure(_):
+                    break
+                }
+        }
+    }
+    func fetchActorById(_ id: Int,handler: @escaping (Actor?) -> Void) {
+        
+        let host = APIBase + "/person" + "/\(id)" + APIKey
+        
+        Alamofire.request(host, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil)
+            .responseJSON { response in
+                switch response.result{
+                case .success(_):
+                    handler(Actor((response.value as? [String: Any])!))
                 case .failure(_):
                     break
                 }
