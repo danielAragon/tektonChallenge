@@ -15,6 +15,7 @@ class SerieViewController: UIViewController {
     @IBOutlet weak var voteAverage: CosmosView!
     @IBOutlet weak var serieImage: UIImageView!
     @IBOutlet weak var overview: UILabel!
+    var serieHomePage: String?
 //    @IBOutlet weak var budget: UILabel!
     
     var serieId: Int!
@@ -28,13 +29,25 @@ class SerieViewController: UIViewController {
 //            if let budget = response!.budget{
 //                self.budget.text = "Budget: \(budget)"
 //            }else { self.budget.text = "" }
+            self.serieHomePage = response!.homepage ?? nil
 
             if let url = URL(string: response!.posterURL){
                 self.serieImage.af_setImage(withURL: url)
             }
         }
     }
-    @IBAction func goToBack(_ sender: Any)
+    @IBAction func share(_ sender: Any) {
+        var message: String
+        if let _message = self.serieHomePage{
+            message = "Hey! checkout \(_message)"
+        }else{
+            message = "Hey! checkout https://www.themoviedb.org"
+        }
+        let activityVC = UIActivityViewController(activityItems: [message], applicationActivities: nil)
+        activityVC.popoverPresentationController?.sourceView = self.view
+        self.present(activityVC, animated: true, completion: nil)
+    }
+    @IBAction func goBack(_ sender: Any)
     {
         self.navigationController?.popViewController(animated: true)
     }

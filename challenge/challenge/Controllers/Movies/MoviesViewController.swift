@@ -18,8 +18,10 @@ class MovieCell: UITableViewCell{
 
 class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
 
+    @IBOutlet weak var page: UILabel!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var serchBar: UISearchBar!
+    @IBOutlet weak var topConstraint: NSLayoutConstraint!
     
     var currentMovies: [Movie]?
     var moviesList: [Movie]?
@@ -30,15 +32,24 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.serchBar.delegate = self
+        self.page.text = "1"
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        APIManager.sharedInstance.fetchMovies(){ (response) in
+        APIManager.sharedInstance.fetchMovies(self.page.text!){ (response) in
             self.currentMovies = response!.movies
             self.moviesList = response!.movies
             self.tableView.reloadData()
         }
+        
+        let size: CGSize = UIScreen.main.bounds.size
+        if size.width / size.height > 1 {
+            self.topConstraint.constant = -40
+        } else {
+            self.topConstraint.constant = -116
+        }
+        
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -79,11 +90,37 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         tableView.reloadData()
     }
     
+    @IBAction func nextPage(_ sender: Any) {
+        self.page.text = "\(Int(self.page.text!)! + 1)"
+        APIManager.sharedInstance.fetchMovies(self.page.text!){ (response) in
+            self.currentMovies = response!.movies
+            self.moviesList = response!.movies
+            self.tableView.reloadData()
+        }
+    }
+    @IBAction func beforePage(_ sender: Any) {
+        guard Int(self.page.text!)! > 1 else {
+            return
+        }
+        self.page.text = "\(Int(self.page.text!)! - 1)"
+        APIManager.sharedInstance.fetchMovies(self.page.text!){ (response) in
+            self.currentMovies = response!.movies
+            self.moviesList = response!.movies
+            self.tableView.reloadData()
+        }
+    }
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showMovie",
             let destination = segue.destination as? MovieViewController,
             let row = tableView.indexPathForSelectedRow?.row{
             destination.movieId = currentMovies![row].id
+        }
+    }
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        if UIDevice.current.orientation.isLandscape {
+            self.topConstraint?.constant = -40
+        } else {
+            self.topConstraint?.constant = -116
         }
     }
 }

@@ -10,12 +10,15 @@ import UIKit
 class SerieCell: UITableViewCell{
     @IBOutlet weak var name: UILabel!
     @IBOutlet weak var overview: UILabel!
-    @IBOutlet weak var serieImage: UIImageView!
+    @IBOutlet weak var serieImage: CustomImage!
 }
 class SeriesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource,UISearchBarDelegate {
 
+    @IBOutlet weak var page: UILabel!
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var topConstraint: NSLayoutConstraint!
+    
     var currentSeries: [Serie]?
     var seriesList: [Serie]?
     
@@ -24,14 +27,21 @@ class SeriesViewController: UIViewController, UITableViewDelegate, UITableViewDa
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.searchBar.delegate = self
+        self.page.text = "1"
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        APIManager.sharedInstance.fetchSeries(){ (response) in
+        APIManager.sharedInstance.fetchSeries(self.page.text!){ (response) in
             self.currentSeries = response!.series
             self.seriesList = response!.series
             self.tableView.reloadData()
+        }
+        let size: CGSize = UIScreen.main.bounds.size
+        if size.width / size.height > 1 {
+            self.topConstraint.constant = -40
+        } else {
+            self.topConstraint.constant = -116
         }
     }
     
@@ -72,12 +82,39 @@ class SeriesViewController: UIViewController, UITableViewDelegate, UITableViewDa
         })
         tableView.reloadData()
     }
+    
+    @IBAction func nextPage(_ sender: Any) {
+        self.page.text = "\(Int(self.page.text!)! + 1)"
+        APIManager.sharedInstance.fetchSeries(self.page.text!){ (response) in
+            self.currentSeries = response!.series
+            self.seriesList = response!.series
+            self.tableView.reloadData()
+        }
+    }
+    @IBAction func beforePage(_ sender: Any) {
+        guard Int(self.page.text!)! > 1 else {
+            return
+        }
+        self.page.text = "\(Int(self.page.text!)! - 1)"
+        APIManager.sharedInstance.fetchSeries(self.page.text!){ (response) in
+            self.currentSeries = response!.series
+            self.seriesList = response!.series
+            self.tableView.reloadData()
+        }
+    }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showSerie",
             let destination = segue.destination as? SerieViewController,
             let row = tableView.indexPathForSelectedRow?.row{
             destination.serieId = currentSeries![row].id
+        }
+    }
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        if UIDevice.current.orientation.isLandscape {
+            self.topConstraint?.constant = -40
+        } else {
+            self.topConstraint?.constant = -116
         }
     }
 }

@@ -22,17 +22,25 @@ class ActorsApiResponse{
 class Actor {
     var id: Int!
     var name: String!
-    var plays: [Play]!
+    var plays: [Play]?
     var profileURL: String!
+    var birthday: String?
+    var gender: Int?
+    var biography: String?
+    var city: String?
     
     init(_ json: [String:Any]){
         self.id = json["id"] as! Int
         self.name = json["name"] as! String
+        self.birthday = json["birthday"] as? String
+        self.gender = json["gender"] as? Int
+        self.biography = json["biography"] as? String
+        self.city = json["place_of_birth"] as? String
         
         if let json = json["known_for"]{
             plays = [Play]()
             for play in json as! NSArray{
-                plays.append(Play(play as! [String : Any]))
+                plays!.append(Play(play as! [String : Any]))
             }
         }
         

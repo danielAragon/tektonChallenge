@@ -26,11 +26,13 @@ class Serie {
     var posterURL: String!
 //    var budget: Int?
     var voteAverage : Float!
+    var homepage: String?
     
     init(_ json: [String:Any]){
         self.id = json["id"] as! Int
         self.name = json["original_name"] as! String
         self.overview = json["overview"] as! String
+        self.homepage = json["homepage"] as? String
         self.posterURL = APIManager.APIImage + "\(json["poster_path"] as! String)"
 //        self.budget = json["budget"] as? Int
         self.voteAverage = (json["vote_average"] as! NSNumber).floatValue

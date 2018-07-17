@@ -13,12 +13,13 @@ public struct APIManager{
     
     static let sharedInstance = APIManager()
     static let APIImage = "https://image.tmdb.org/t/p/w500"
+    
     let APIBase = "https://api.themoviedb.org/3"
     let APIKey = "?api_key=07db23794cd348240def66ce0def1c34"
 
-    func fetchMovies(handler: @escaping (MoviesApiResponse?) -> Void) {
+    func fetchMovies(_ page: String, handler: @escaping (MoviesApiResponse?) -> Void) {
         
-        let host = APIBase + "/movie/popular" + APIKey
+        let host = APIBase + "/movie/popular" + APIKey + "&page=\(page)"
         
         Alamofire.request(host, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil)
             .responseJSON { response in
@@ -31,9 +32,9 @@ public struct APIManager{
 
         }
     }
-    func fetchSeries(handler: @escaping (SeriesApiResponse?) -> Void) {
+    func fetchSeries(_ page: String, handler: @escaping (SeriesApiResponse?) -> Void) {
         
-        let host = APIBase + "/tv/popular" + APIKey
+        let host = APIBase + "/tv/popular" + APIKey + "&page=\(page)"
         
         Alamofire.request(host, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil)
             .responseJSON { response in
@@ -46,9 +47,9 @@ public struct APIManager{
                 
         }
     }
-    func fetchActors(handler: @escaping (ActorsApiResponse?) -> Void) {
+    func fetchActors(_ page: String, handler: @escaping (ActorsApiResponse?) -> Void) {
         
-        let host = APIBase + "/person/popular" + APIKey
+        let host = APIBase + "/person/popular" + APIKey + "&page=\(page)"
         
         Alamofire.request(host, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil)
             .responseJSON { response in

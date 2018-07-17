@@ -15,8 +15,10 @@ class ActorCell: UITableViewCell{
 }
 class ActorsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
 
+    @IBOutlet weak var page: UILabel!
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var topConstraint: NSLayoutConstraint!
     var currentActors: [Actor]?
     var actorsList: [Actor]?
     
@@ -25,14 +27,21 @@ class ActorsViewController: UIViewController, UITableViewDataSource, UITableView
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.searchBar.delegate = self
+        self.page.text = "1"
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        APIManager.sharedInstance.fetchActors(){ (response) in
+        APIManager.sharedInstance.fetchActors(self.page.text!){ (response) in
             self.currentActors = response!.actors
             self.actorsList = response!.actors
             self.tableView.reloadData()
+        }
+        let size: CGSize = UIScreen.main.bounds.size
+        if size.width / size.height > 1 {
+            self.topConstraint.constant = -40
+        } else {
+            self.topConstraint.constant = -116
         }
     }
     
@@ -56,7 +65,7 @@ class ActorsViewController: UIViewController, UITableViewDataSource, UITableView
         let actorCell = tableView.dequeueReusableCell(withIdentifier: String(describing: ActorCell.self), for: indexPath) as! ActorCell
         actorCell.name.text = currentActors![indexPath.row].name
         var overviewText = "Known for:"
-        for play in currentActors![indexPath.row].plays{
+        for play in currentActors![indexPath.row].plays!{
             overviewText += "\n\(play.appellation!)"
         }
         actorCell.overview.text = overviewText
@@ -78,6 +87,26 @@ class ActorsViewController: UIViewController, UITableViewDataSource, UITableView
         tableView.reloadData()
     }
     
+    @IBAction func nextPage(_ sender: Any) {
+        self.page.text = "\(Int(self.page.text!)! + 1)"
+        APIManager.sharedInstance.fetchActors(self.page.text!){ (response) in
+            self.currentActors = response!.actors
+            self.actorsList = response!.actors
+            self.tableView.reloadData()
+        }
+    }
+    @IBAction func beforePage(_ sender: Any) {
+        guard Int(self.page.text!)! > 1 else {
+            return
+        }
+        self.page.text = "\(Int(self.page.text!)! - 1)"
+        APIManager.sharedInstance.fetchActors(self.page.text!){ (response) in
+            self.currentActors = response!.actors
+            self.actorsList = response!.actors
+            self.tableView.reloadData()
+        }
+    }
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showActor",
             let destination = segue.destination as? ActorViewController,
@@ -85,5 +114,11 @@ class ActorsViewController: UIViewController, UITableViewDataSource, UITableView
             destination.actorId = currentActors![row].id
         }
     }
-    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        if UIDevice.current.orientation.isLandscape {
+            self.topConstraint?.constant = -40
+        } else {
+            self.topConstraint?.constant = -116
+        }
+    }
 }
